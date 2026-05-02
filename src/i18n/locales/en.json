@@ -1,0 +1,75 @@
+{
+  "app": {
+    "name": "Fermata"
+  },
+  "toolbar": {
+    "import": "Import",
+    "export": "Export",
+    "exportText": "Export text (.mw)",
+    "exportPdf": "Export PDF",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
+    "language": "Language"
+  },
+  "tabs": {
+    "calendar": "Calendar",
+    "gantt": "Gantt",
+    "timeline": "Timeline",
+    "list": "List",
+    "kanban": "Kanban",
+    "agenda": "Agenda"
+  },
+  "editor": {
+    "placeholder": "Write your Markwhen document here..."
+  },
+  "modal": {
+    "editTask": "Edit task",
+    "title": "Title",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "section": "Section",
+    "tags": "Tags",
+    "tagsHelp": "Comma-separated",
+    "assignees": "Assignees",
+    "assigneesHelp": "Comma-separated",
+    "status": "Status",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "kanban": {
+    "todo": "To do",
+    "doing": "In progress",
+    "done": "Done",
+    "none": "No status"
+  },
+  "list": {
+    "title": "Title",
+    "start": "Start",
+    "end": "End",
+    "section": "Section",
+    "assignees": "Assignees",
+    "tags": "Tags",
+    "noTasks": "No tasks"
+  },
+  "calendar": {
+    "today": "Today"
+  },
+  "pdf": {
+    "title": "Export PDF",
+    "selectViews": "Select views to include",
+    "export": "Export",
+    "cancel": "Cancel",
+    "generating": "Generating PDF..."
+  },
+  "status": {
+    "todo": "To do",
+    "doing": "In progress",
+    "done": "Done",
+    "none": "No status"
+  },
+  "import": {
+    "dropOrClick": "Drop a .mw or .md file, or click to import"
+  }
+}

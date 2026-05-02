@@ -1,0 +1,142 @@
+title: Calendari Admissió i Matrícula - Música i Dansa 2026/2027
+
+#matricula: #3b82f6
+#vacants: #10b981
+#inscripcio: #8b5cf6
+#reclamacio: #f59e0b
+#publicacio: #06b6d4
+#proves: #ef4444
+#taxes: #64748b
+#adjudicacio: #ec4899
+
+// ─────────────────────────────────────────────
+// 1. Confirmació de plaça i matrícula alumnat del centre
+// ─────────────────────────────────────────────
+
+# Matrícula alumnat del centre
+
+2026-06-15 / 2026-06-26: Matrícula alumnat EE i EP amb assignatures aprovades (conv. ordinària) #matricula
+
+2026-07-03: Data límit matrícula alumnat EP - avaluació extraordinària #matricula
+
+// ─────────────────────────────────────────────
+// 2. Publicació d'oferta de vacants
+// ─────────────────────────────────────────────
+
+# Oferta de vacants
+
+2026-05-05: Previsió d'oferta de vacants per especialitat #vacants #publicacio
+
+2026-06-30: Oferta actualitzada de vacants per especialitat #vacants #publicacio
+
+2026-07-17: Oferta vacants no cobertes en 1a adjudicació #vacants #publicacio
+
+2026-07-24: Oferta vacants no cobertes en 2a adjudicació #vacants #publicacio
+
+2026-09-16: Oferta vacants no cobertes en conv. extraordinària #vacants #publicacio
+
+// ─────────────────────────────────────────────
+// 3. Convocatòria ordinària - Proves d'accés
+// ─────────────────────────────────────────────
+
+# Convocatòria ordinària
+
+2026-05-05 / 2026-05-19: Inscripció proves d'accés EE i EP #inscripcio
+
+2026-05-19 / 2026-05-25: Revisió i validació d'inscripcions pels centres #inscripcio
+
+2026-05-26: Publicació llistes provisionals admesos i exclosos #publicacio
+
+2026-05-27 / 2026-05-29: Reclamació llistes provisionals #reclamacio
+
+2026-05-27 / 2026-06-02: Resolució reclamacions pels centres #reclamacio
+
+2026-05-26 / 2026-06-05: Pagament de taxes #taxes
+
+2026-06-09: Publicació llistes definitives admesos i exclosos #publicacio
+
+2026-06-10: Publicació composició dels tribunals #publicacio
+
+2026-06-15 / 2026-06-22: Realització proves d'accés EE i EP #proves
+
+2026-06-25: Publicació resultats provisionals proves d'accés #publicacio #proves
+
+2026-06-26 / 2026-06-29: Reclamació resultats provisionals #reclamacio
+
+2026-06-30: Resolució de reclamacions #reclamacio
+
+2026-07-01: Publicació resultats definitius proves d'accés #publicacio #proves
+
+// ─────────────────────────────────────────────
+// Readmissió i canvi d'especialitat
+// ─────────────────────────────────────────────
+
+# Readmissió i canvi d'especialitat
+
+2026-06-01 / 2026-06-26: Sol·licitud readmissió i canvi d'especialitat #inscripcio
+
+// ─────────────────────────────────────────────
+// Matriculació 1a adjudicació
+// ─────────────────────────────────────────────
+
+# Matriculació - 1a adjudicació
+
+2026-07-06 / 2026-07-10: Nivell 1 de prioritat #adjudicacio #matricula
+
+2026-07-06 / 2026-07-10: Nivell 2 prioritat - tram A (4t a 2n curs EE) #adjudicacio #matricula
+
+2026-07-13 / 2026-07-15: Nivell 2 prioritat - tram B (1r curs EE) #adjudicacio #matricula
+
+2026-07-16 / 2026-07-17: Nivell 3 de prioritat #adjudicacio #matricula
+
+2026-07-16 / 2026-07-17: Nivell 4 de prioritat #adjudicacio #matricula
+
+// ─────────────────────────────────────────────
+// Matriculació 2a adjudicació
+// ─────────────────────────────────────────────
+
+# Matriculació - 2a adjudicació
+
+2026-07-01 / 2026-07-20: Sol·licitud participació en la 2a adjudicació #inscripcio #adjudicacio
+
+2026-07-21 / 2026-07-23: Adjudicació de vacants i matrícula 2a adjudicació #adjudicacio #matricula
+
+// ─────────────────────────────────────────────
+// 4. Convocatòria extraordinària
+// ─────────────────────────────────────────────
+
+# Convocatòria extraordinària
+
+2026-07-10: Sol·licitud autorització conv. extraordinària #inscripcio
+
+2026-07-14: Resolució autorització conv. extraordinària #publicacio
+
+2026-07-13 / 2026-07-15: Configuració oferta educativa ITACA3-GAC #inscripcio
+
+2026-07-16 / 2026-07-20: Inscripció proves d'accés (extraordinària) #inscripcio
+
+2026-07-20 / 2026-07-22: Revisió i validació inscripcions pels centres #inscripcio
+
+2026-07-23: Publicació llistes provisionals admesos i exclosos #publicacio
+
+2026-07-24 / 2026-07-28: Reclamació llistes provisionals #reclamacio
+
+2026-07-24 / 2026-07-29: Resolució reclamacions pels centres #reclamacio
+
+2026-07-24 / 2026-07-30: Pagament de taxes #taxes
+
+2026-07-31: Publicació llistes definitives admesos i exclosos #publicacio
+
+2026-09-01: Publicació composició dels tribunals #publicacio
+
+2026-09-02 / 2026-09-04: Realització proves d'accés EE i EP (extraordinària) #proves
+
+2026-09-07: Publicació resultats provisionals proves d'accés #publicacio #proves
+
+2026-09-08 / 2026-09-10: Reclamació resultats provisionals #reclamacio
+
+2026-09-11: Resolució de reclamacions #reclamacio
+
+2026-09-14: Publicació resultats definitius proves d'accés #publicacio #proves
+
+2026-09-15 / 2026-09-16: Adjudicació de vacants i matrícula (extraordinària) #adjudicacio #matricula

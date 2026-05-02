@@ -1,0 +1,75 @@
+{
+  "app": {
+    "name": "Fermata"
+  },
+  "toolbar": {
+    "import": "Importar",
+    "export": "Exportar",
+    "exportText": "Exportar texto (.mw)",
+    "exportPdf": "Exportar PDF",
+    "theme": "Tema",
+    "themeLight": "Claro",
+    "themeDark": "Oscuro",
+    "themeSystem": "Sistema",
+    "language": "Idioma"
+  },
+  "tabs": {
+    "calendar": "Calendario",
+    "gantt": "Gantt",
+    "timeline": "Timeline",
+    "list": "Lista",
+    "kanban": "Kanban",
+    "agenda": "Agenda"
+  },
+  "editor": {
+    "placeholder": "Escribe tu documento Markwhen aquí..."
+  },
+  "modal": {
+    "editTask": "Editar tarea",
+    "title": "Título",
+    "startDate": "Fecha inicio",
+    "endDate": "Fecha fin",
+    "section": "Sección",
+    "tags": "Etiquetas",
+    "tagsHelp": "Separadas por coma",
+    "assignees": "Asignados",
+    "assigneesHelp": "Separados por coma",
+    "status": "Estado",
+    "save": "Guardar",
+    "cancel": "Cancelar"
+  },
+  "kanban": {
+    "todo": "Por hacer",
+    "doing": "En curso",
+    "done": "Hecho",
+    "none": "Sin estado"
+  },
+  "list": {
+    "title": "Título",
+    "start": "Inicio",
+    "end": "Fin",
+    "section": "Sección",
+    "assignees": "Asignados",
+    "tags": "Etiquetas",
+    "noTasks": "No hay tareas"
+  },
+  "calendar": {
+    "today": "Hoy"
+  },
+  "pdf": {
+    "title": "Exportar PDF",
+    "selectViews": "Selecciona las vistas a incluir",
+    "export": "Exportar",
+    "cancel": "Cancelar",
+    "generating": "Generando PDF..."
+  },
+  "status": {
+    "todo": "Por hacer",
+    "doing": "En curso",
+    "done": "Hecho",
+    "none": "Sin estado"
+  },
+  "import": {
+    "dropOrClick": "Arrastra un archivo .mw o .md, o haz clic para importar"
+  }
+}

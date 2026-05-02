@@ -1,0 +1,75 @@
+{
+  "app": {
+    "name": "Fermata"
+  },
+  "toolbar": {
+    "import": "Importar",
+    "export": "Exportar",
+    "exportText": "Exportar text (.mw)",
+    "exportPdf": "Exportar PDF",
+    "theme": "Tema",
+    "themeLight": "Clar",
+    "themeDark": "Fosc",
+    "themeSystem": "Sistema",
+    "language": "Idioma"
+  },
+  "tabs": {
+    "calendar": "Calendari",
+    "gantt": "Gantt",
+    "timeline": "Timeline",
+    "list": "Llista",
+    "kanban": "Kanban",
+    "agenda": "Agenda"
+  },
+  "editor": {
+    "placeholder": "Escriu el teu document Markwhen ací..."
+  },
+  "modal": {
+    "editTask": "Editar tasca",
+    "title": "Títol",
+    "startDate": "Data d'inici",
+    "endDate": "Data de fi",
+    "section": "Secció",
+    "tags": "Etiquetes",
+    "tagsHelp": "Separades per coma",
+    "assignees": "Assignats",
+    "assigneesHelp": "Separats per coma",
+    "status": "Estat",
+    "save": "Guardar",
+    "cancel": "Cancel·lar"
+  },
+  "kanban": {
+    "todo": "Per fer",
+    "doing": "En curs",
+    "done": "Fet",
+    "none": "Sense estat"
+  },
+  "list": {
+    "title": "Títol",
+    "start": "Inici",
+    "end": "Fi",
+    "section": "Secció",
+    "assignees": "Assignats",
+    "tags": "Etiquetes",
+    "noTasks": "No hi ha tasques"
+  },
+  "calendar": {
+    "today": "Hui"
+  },
+  "pdf": {
+    "title": "Exportar PDF",
+    "selectViews": "Selecciona les vistes a incloure",
+    "export": "Exportar",
+    "cancel": "Cancel·lar",
+    "generating": "Generant PDF..."
+  },
+  "status": {
+    "todo": "Per fer",
+    "doing": "En curs",
+    "done": "Fet",
+    "none": "Sense estat"
+  },
+  "import": {
+    "dropOrClick": "Arrossega un fitxer .mw o .md, o fes clic per a importar"
+  }
+}

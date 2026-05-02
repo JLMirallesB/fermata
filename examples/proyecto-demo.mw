@@ -1,0 +1,49 @@
+title: Proyecto Demo Fermata
+
+#diseno: #8b5cf6
+#desarrollo: #3b82f6
+#testing: #10b981
+#todo: #f59e0b
+#doing: #6366f1
+#done: #22c55e
+
+# Fase 1 - Planificación
+
+2024-01-08 / 2024-01-19: Investigación de mercado #diseno #done
+assignee: Ana
+
+2024-01-15 / 2024-01-26: Definición de requisitos #diseno #done
+assignee: Carlos
+
+2024-01-29: Kickoff del proyecto #diseno #done
+
+# Fase 2 - Diseño
+
+2024-02-01 / 2024-02-16: Wireframes y prototipos #diseno #done
+assignee: Ana
+
+2024-02-12 / 2024-02-23: Diseño visual #diseno #doing
+assignee: Ana
+
+2024-02-26: Revisión de diseño #diseno #todo
+
+# Fase 3 - Desarrollo
+
+2024-03-01 / 2024-03-22: Backend API #desarrollo #doing
+assignee: Carlos
+
+2024-03-11 / 2024-04-05: Frontend React #desarrollo #todo
+assignees: Elena, David
+
+2024-03-25 / 2024-04-05: Integración #desarrollo #todo
+assignee: Carlos
+
+# Fase 4 - Testing y Lanzamiento
+
+2024-04-08 / 2024-04-19: QA y testing #testing #todo
+assignees: Elena, Ana
+
+2024-04-15 / 2024-04-19: Corrección de bugs #testing #todo
+assignee: David
+
+2024-04-22: Lanzamiento v1.0 #desarrollo
