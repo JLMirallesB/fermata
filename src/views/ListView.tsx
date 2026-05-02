@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Task } from '../core/model';
 import { formatDate } from '../core/edit';
+import { ProgressBar } from '../components/ProgressBar';
+import { TaskTooltip } from '../components/TaskTooltip';
 
 interface ListViewProps {
   tasks: Task[];
@@ -92,15 +94,19 @@ export function ListView({ tasks, tagColors, onTaskClick }: ListViewProps) {
               className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50"
             >
               <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
-                <div className="flex items-center gap-2">
-                  {task.color && (
-                    <span
-                      className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
-                      style={{ backgroundColor: task.color }}
-                    />
-                  )}
-                  {task.milestone ? '◆ ' : ''}{task.title}
-                </div>
+                <TaskTooltip task={task}>
+                  <div className="flex items-center gap-2">
+                    {task.color && (
+                      <span
+                        className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
+                        style={{ backgroundColor: task.color }}
+                      />
+                    )}
+                    <span>{task.milestone ? '◆ ' : ''}{task.title}</span>
+                    {task.notes.length > 0 && <span className="text-gray-400">💬</span>}
+                    <ProgressBar checklist={task.checklist} />
+                  </div>
+                </TaskTooltip>
               </td>
               <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                 {formatDate(task.start)}

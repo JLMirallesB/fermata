@@ -40,10 +40,21 @@ const DEFAULT_DOCUMENT = `title: Calendari Admissió i Matrícula - Música i Da
 # Convocatòria ordinària
 
 2026-05-05 / 2026-05-19: Inscripció proves d'accés EE i EP #inscripcio
+id: inscripcio
+- [x] Obrir plataforma d'inscripció
+- [x] Publicar requisits
+- [ ] Tancar termini inscripció
 
 2026-05-19 / 2026-05-25: Revisió i validació d'inscripcions pels centres #inscripcio
+id: validacio
+depends: inscripcio
+- [ ] Verificar documentació
+- [ ] Validar dades acadèmiques
+- [ ] Confirmar pagaments
 
 2026-05-26: Publicació llistes provisionals admesos i exclosos #publicacio
+id: llistes-prov
+depends: validacio
 
 2026-05-27 / 2026-05-29: Reclamació llistes provisionals #reclamacio
 
@@ -56,6 +67,8 @@ const DEFAULT_DOCUMENT = `title: Calendari Admissió i Matrícula - Música i Da
 2026-06-10: Publicació composició dels tribunals #publicacio
 
 2026-06-15 / 2026-06-22: Realització proves d'accés EE i EP #proves
+// Horari: 9:00 a 14:00
+// Aules 101, 102 i 103 del conservatori
 
 2026-06-25: Publicació resultats provisionals proves d'accés #publicacio #proves
 

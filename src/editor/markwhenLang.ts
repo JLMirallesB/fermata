@@ -14,7 +14,17 @@ const markwhenParser: StreamParser<MarkwhenState> = {
       return 'comment';
     }
 
-    // Header keys: title:, dateFormat:, description:, view:, etc. (at line start)
+    // Checked checkbox: - [x]
+    if (stream.match(/^-\s*\[x\]/i)) {
+      return 'meta';
+    }
+
+    // Unchecked checkbox: - [ ]
+    if (stream.match(/^-\s*\[ \]/)) {
+      return 'punctuation';
+    }
+
+    // Header keys at line start
     if (stream.sol() && stream.match(/^(title|dateFormat|description|view|timezone|tz):/)) {
       return 'keyword';
     }
@@ -29,31 +39,40 @@ const markwhenParser: StreamParser<MarkwhenState> = {
       return 'heading';
     }
 
-    // Property keys: assignee:, assignees:, or any key: at start of line with leading whitespace allowed
-    if (stream.sol() && stream.match(/^\s*\w+:/)) {
+    // Property keys: assignee:, assignees:, or any key: value
+    if (stream.sol() && stream.match(/^\s*(assignee|assignees|location|id|percent|completed):/)) {
       return 'propertyName';
     }
 
-    // Date ranges: YYYY-MM-DD / YYYY-MM-DD or single dates YYYY-MM-DD
+    // Generic property key at start of line
+    if (stream.sol() && stream.match(/^\s*[\w\-.]+:/)) {
+      return 'propertyName';
+    }
+
+    // Date ranges: YYYY-MM-DD / YYYY-MM-DD
     if (stream.match(/^\d{4}-\d{2}-\d{2}\s*\/\s*\d{4}-\d{2}-\d{2}/)) {
       return 'number';
     }
+    // Single dates: YYYY-MM-DD
     if (stream.match(/^\d{4}-\d{2}-\d{2}/)) {
       return 'number';
     }
 
-    // Also match relative dates and casual dates: month year, etc.
-    // Match date-like patterns more loosely
+    // European/American dates: d/m/y
     if (stream.match(/^\d{1,2}\/\d{1,2}\/\d{2,4}/)) {
       return 'number';
     }
 
-    // Inline tags: #tagname (not at line start or after a tag definition)
+    // Inline tags: #tagname
     if (stream.match(/^#\w+/)) {
       return 'tag';
     }
 
-    // Skip to next interesting character
+    // List item indicator: -
+    if (stream.sol() && stream.match(/^-\s/)) {
+      return 'punctuation';
+    }
+
     stream.next();
     return null;
   },

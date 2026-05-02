@@ -2,18 +2,30 @@ import { parse, isEvent } from '@markwhen/parser';
 import type { Event, EventGroup, Eventy } from '@markwhen/parser';
 import { deriveStatus, type KanbanStatus } from './status.js';
 
+export interface ChecklistItem {
+  label: string;
+  checked: boolean;
+  range: { from: number; to: number };
+}
+
 export interface Task {
   id: string;
+  eventId: string | null;
   title: string;
   start: Date;
   end: Date;
   section: string;
+  sectionPath: string[];
   tags: string[];
   assignees: string[];
   milestone: boolean;
   color: string | null;
   status: KanbanStatus;
   textRange: { from: number; to: number };
+  checklist: ChecklistItem[];
+  notes: string[];
+  noteRanges: { from: number; to: number }[];
+  depends: string[];
 }
 
 export interface TagColor {
@@ -59,6 +71,28 @@ function extractAssignees(properties: Record<string, string>): string[] {
  * Determine if an event is a milestone by checking its datePart string.
  * A milestone has a single date (no `/` separator in the date part).
  */
+function extractChecklist(event: Event): ChecklistItem[] {
+  const items: ChecklistItem[] = [];
+  const checkboxSups = event.supplemental
+    .filter((s) => s.type === 'checkbox') as unknown as { type: string; raw: string; value: boolean }[];
+  const ranges = event.matchedListItems;
+
+  let supIndex = 0;
+  for (let i = 0; i < ranges.length; i++) {
+    const range = ranges[i];
+    if (range.type === 'checkboxItemIndicator') {
+      const label = supIndex < checkboxSups.length ? checkboxSups[supIndex].raw : '';
+      items.push({
+        label,
+        checked: !!range.content,
+        range: { from: range.from, to: range.to },
+      });
+      supIndex++;
+    }
+  }
+  return items;
+}
+
 function isMilestone(event: Event): boolean {
   const datePart = event.firstLine.datePart ?? '';
   return !datePart.includes('/');
@@ -67,11 +101,35 @@ function isMilestone(event: Event): boolean {
 /**
  * Walk the event tree, collecting tasks with their parent section context.
  */
+function extractNotes(
+  event: Event,
+  text: string,
+  commentRanges: { from: number; to: number }[],
+): { notes: string[]; noteRanges: { from: number; to: number }[] } {
+  const eventFrom = event.textRanges.whole.from;
+  const eventTo = event.textRanges.whole.to;
+  const notes: string[] = [];
+  const ranges: { from: number; to: number }[] = [];
+  for (const cr of commentRanges) {
+    if (cr.from >= eventFrom && cr.to <= eventTo) {
+      const raw = text.slice(cr.from, cr.to);
+      const cleaned = raw.replace(/^\/\/\s?/, '').trim();
+      if (cleaned) {
+        notes.push(cleaned);
+        ranges.push(cr);
+      }
+    }
+  }
+  return { notes, noteRanges: ranges };
+}
+
 function walkEvents(
   node: Eventy,
-  section: string,
+  path: string[],
   tasks: Task[],
   tagColors: Record<string, string>,
+  text: string,
+  commentRanges: { from: number; to: number }[],
 ): void {
   if (isEvent(node)) {
     const event = node;
@@ -79,12 +137,18 @@ function walkEvents(
     const assignees = extractAssignees(event.properties as Record<string, string>);
     const firstTagColor = tags.length > 0 ? (tagColors[tags[0]] ?? null) : null;
 
+    const props = event.properties as Record<string, string>;
+    const dependsRaw = props['depends'] ?? '';
+    const depends = dependsRaw ? dependsRaw.split(',').map((s) => s.trim()).filter(Boolean) : [];
+
     const task: Task = {
       id: `task-${tasks.length}`,
+      eventId: event.id ?? null,
       title: event.firstLine.restTrimmed,
       start: new Date(event.dateRangeIso.fromDateTimeIso),
       end: new Date(event.dateRangeIso.toDateTimeIso),
-      section,
+      section: path[path.length - 1] ?? '',
+      sectionPath: path,
       tags,
       assignees,
       milestone: isMilestone(event),
@@ -94,13 +158,16 @@ function walkEvents(
         from: event.textRanges.whole.from,
         to: event.textRanges.whole.to,
       },
+      checklist: extractChecklist(event),
+      ...extractNotes(event, text, commentRanges),
+      depends,
     };
     tasks.push(task);
   } else {
     const group = node as EventGroup;
-    const groupSection = group.title || section;
+    const childPath = group.title ? [...path, group.title] : path;
     for (const child of group.children) {
-      walkEvents(child, groupSection, tasks, tagColors);
+      walkEvents(child, childPath, tasks, tagColors, text, commentRanges);
     }
   }
 }
@@ -113,7 +180,18 @@ export function parseTasks(text: string): { tasks: Task[]; tagColors: Record<str
   const result = parse(text);
   const tasks: Task[] = [];
 
-  walkEvents(result.events, '', tasks, tagColors);
+  const seen = new Set<string>();
+  const commentRanges = result.ranges
+    .filter((r) => r.type === 'comment')
+    .filter((r) => {
+      const key = `${r.from}:${r.to}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .map((r) => ({ from: r.from, to: r.to }));
+
+  walkEvents(result.events, [], tasks, tagColors, text, commentRanges);
 
   return { tasks, tagColors };
 }

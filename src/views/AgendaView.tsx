@@ -2,15 +2,17 @@ import FullCalendar from '@fullcalendar/react';
 import listPlugin from '@fullcalendar/list';
 import { useTranslation } from 'react-i18next';
 import type { Task } from '../core/model';
+import { attachDomTooltip } from '../components/TaskTooltip';
 
 interface AgendaViewProps {
   tasks: Task[];
   tagColors: Record<string, string>;
   onTaskClick: (task: Task) => void;
+  hideWeekends: boolean;
 }
 
-export function AgendaView({ tasks, tagColors, onTaskClick }: AgendaViewProps) {
-  const { i18n } = useTranslation();
+export function AgendaView({ tasks, tagColors, onTaskClick, hideWeekends }: AgendaViewProps) {
+  const { i18n, t } = useTranslation();
 
   const events = tasks.map((task) => ({
     id: task.id,
@@ -37,10 +39,20 @@ export function AgendaView({ tasks, tagColors, onTaskClick }: AgendaViewProps) {
           center: 'title',
           right: 'listWeek,listMonth',
         }}
+        buttonText={{
+          listWeek: t('agenda.week'),
+          listMonth: t('agenda.month'),
+        }}
+        firstDay={1}
+        hiddenDays={hideWeekends ? [0, 6] : []}
         height="100%"
         eventClick={(info) => {
           const task = info.event.extendedProps.task as Task;
           onTaskClick(task);
+        }}
+        eventDidMount={(info) => {
+          const task = info.event.extendedProps.task as Task;
+          attachDomTooltip(info.el, task.notes);
         }}
       />
     </div>

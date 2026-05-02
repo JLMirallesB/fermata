@@ -8,6 +8,7 @@ html, body, #root {
   overflow: hidden;
 }
 
+
 .fc .fc-button-primary {
   background-color: #6366f1 !important;
   border-color: #6366f1 !important;
@@ -23,6 +24,16 @@ html, body, #root {
   opacity: 0.5;
 }
 
+.fc .fc-day-sat,
+.fc .fc-day-sun {
+  background-color: rgba(249, 115, 22, 0.05);
+}
+
+.fc .fc-col-header-cell.fc-day-sat,
+.fc .fc-col-header-cell.fc-day-sun {
+  color: #ea580c;
+}
+
 .dark .fc {
   --fc-border-color: #374151;
   --fc-page-bg-color: #111827;
@@ -30,4 +41,14 @@ html, body, #root {
   --fc-list-event-hover-bg-color: #1f2937;
   --fc-today-bg-color: rgba(99, 102, 241, 0.1);
   color: #d1d5db;
+}
+
+.dark .fc .fc-day-sat,
+.dark .fc .fc-day-sun {
+  background-color: rgba(249, 115, 22, 0.08);
+}
+
+.dark .fc .fc-col-header-cell.fc-day-sat,
+.dark .fc .fc-col-header-cell.fc-day-sun {
+  color: #fb923c;
 }

@@ -2,14 +2,16 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { useTranslation } from 'react-i18next';
 import type { Task } from '../core/model';
+import { attachDomTooltip } from '../components/TaskTooltip';
 
 interface CalendarViewProps {
   tasks: Task[];
   tagColors: Record<string, string>;
   onTaskClick: (task: Task) => void;
+  hideWeekends: boolean;
 }
 
-export function CalendarView({ tasks, tagColors, onTaskClick }: CalendarViewProps) {
+export function CalendarView({ tasks, tagColors, onTaskClick, hideWeekends }: CalendarViewProps) {
   const { i18n } = useTranslation();
 
   const events = tasks.map((task) => ({
@@ -37,11 +39,17 @@ export function CalendarView({ tasks, tagColors, onTaskClick }: CalendarViewProp
           center: 'title',
           right: 'dayGridMonth,dayGridWeek',
         }}
+        firstDay={1}
+        hiddenDays={hideWeekends ? [0, 6] : []}
         nowIndicator={true}
         height="100%"
         eventClick={(info) => {
           const task = info.event.extendedProps.task as Task;
           onTaskClick(task);
+        }}
+        eventDidMount={(info) => {
+          const task = info.event.extendedProps.task as Task;
+          attachDomTooltip(info.el, task.notes);
         }}
       />
     </div>

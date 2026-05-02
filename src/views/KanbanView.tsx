@@ -1,17 +1,22 @@
+import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Task } from '../core/model';
 import type { KanbanStatus } from '../core/status';
+import { ProgressBar } from '../components/ProgressBar';
+import { TaskTooltip } from '../components/TaskTooltip';
 
 interface KanbanViewProps {
   tasks: Task[];
   tagColors: Record<string, string>;
   onTaskClick: (task: Task) => void;
+  onStatusChange?: (task: Task, newStatus: KanbanStatus) => void;
 }
 
 const COLUMNS: KanbanStatus[] = ['todo', 'doing', 'done', 'none'];
 
-export function KanbanView({ tasks, tagColors, onTaskClick }: KanbanViewProps) {
+export function KanbanView({ tasks, tagColors, onTaskClick, onStatusChange }: KanbanViewProps) {
   const { t } = useTranslation();
+  const [dragOverCol, setDragOverCol] = useState<KanbanStatus | null>(null);
 
   const grouped = COLUMNS.reduce<Record<KanbanStatus, Task[]>>((acc, col) => {
     acc[col] = tasks.filter((task) => task.status === col);
@@ -25,12 +30,42 @@ export function KanbanView({ tasks, tagColors, onTaskClick }: KanbanViewProps) {
     none: 'border-gray-300 dark:border-gray-600',
   };
 
+  const handleDragStart = useCallback((e: React.DragEvent, task: Task) => {
+    e.dataTransfer.setData('text/plain', task.id);
+    e.dataTransfer.effectAllowed = 'move';
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent, col: KanbanStatus) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverCol(col);
+  }, []);
+
+  const handleDragLeave = useCallback(() => {
+    setDragOverCol(null);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent, targetCol: KanbanStatus) => {
+    e.preventDefault();
+    setDragOverCol(null);
+    const taskId = e.dataTransfer.getData('text/plain');
+    const task = tasks.find((t) => t.id === taskId);
+    if (task && task.status !== targetCol && onStatusChange) {
+      onStatusChange(task, targetCol);
+    }
+  }, [tasks, onStatusChange]);
+
   return (
     <div className="flex h-full gap-4 overflow-x-auto p-4">
       {COLUMNS.map((col) => (
         <div
           key={col}
-          className={`flex w-72 shrink-0 flex-col rounded-lg border-t-4 bg-gray-50 dark:bg-gray-800/50 ${columnColors[col]}`}
+          onDragOver={(e) => handleDragOver(e, col)}
+          onDragLeave={handleDragLeave}
+          onDrop={(e) => handleDrop(e, col)}
+          className={`flex w-72 shrink-0 flex-col rounded-lg border-t-4 bg-gray-50 transition-colors dark:bg-gray-800/50 ${columnColors[col]} ${
+            dragOverCol === col ? 'ring-2 ring-indigo-400 bg-indigo-50/50 dark:bg-indigo-900/20' : ''
+          }`}
         >
           <div className="flex items-center justify-between px-3 py-2">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
@@ -42,10 +77,12 @@ export function KanbanView({ tasks, tagColors, onTaskClick }: KanbanViewProps) {
           </div>
           <div className="flex-1 space-y-2 overflow-y-auto px-2 pb-2">
             {grouped[col].map((task) => (
+              <TaskTooltip task={task} key={task.id}>
               <div
-                key={task.id}
+                draggable
+                onDragStart={(e) => handleDragStart(e, task)}
                 onClick={() => onTaskClick(task)}
-                className="cursor-pointer rounded-lg border border-gray-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+                className="cursor-grab rounded-lg border border-gray-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md active:cursor-grabbing dark:border-gray-700 dark:bg-gray-800"
               >
                 <div className="flex items-start gap-2">
                   {task.color && (
@@ -57,7 +94,13 @@ export function KanbanView({ tasks, tagColors, onTaskClick }: KanbanViewProps) {
                   <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                     {task.milestone ? '◆ ' : ''}{task.title}
                   </span>
+                  {task.notes.length > 0 && <span className="text-gray-400">💬</span>}
                 </div>
+                {task.checklist.length > 0 && (
+                  <div className="mt-1">
+                    <ProgressBar checklist={task.checklist} />
+                  </div>
+                )}
                 {task.section && (
                   <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     {task.section}
@@ -82,6 +125,7 @@ export function KanbanView({ tasks, tagColors, onTaskClick }: KanbanViewProps) {
                   </div>
                 )}
               </div>
+              </TaskTooltip>
             ))}
           </div>
         </div>

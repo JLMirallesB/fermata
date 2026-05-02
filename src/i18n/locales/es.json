@@ -11,7 +11,9 @@
     "themeLight": "Claro",
     "themeDark": "Oscuro",
     "themeSystem": "Sistema",
-    "language": "Idioma"
+    "language": "Idioma",
+    "hideEditor": "Ocultar editor",
+    "showEditor": "Mostrar editor"
   },
   "tabs": {
     "calendar": "Calendario",
@@ -35,6 +37,14 @@
     "assignees": "Asignados",
     "assigneesHelp": "Separados por coma",
     "status": "Estado",
+    "checklist": "Checklist",
+    "notes": "Notas",
+    "notesHelp": "Una nota por línea",
+    "depends": "Depende de",
+    "dependsAdd": "Añadir dependencia...",
+    "dependsNone": "No hay tareas con ID definido",
+    "dependsConflict": "Conflicto: empieza antes de que termine la dependencia",
+    "dependedBy": "Requerida por",
     "save": "Guardar",
     "cancel": "Cancelar"
   },
@@ -54,7 +64,13 @@
     "noTasks": "No hay tareas"
   },
   "calendar": {
-    "today": "Hoy"
+    "today": "Hoy",
+    "hideWeekends": "Ocultar fines de semana",
+    "showWeekends": "Mostrar fines de semana"
+  },
+  "agenda": {
+    "week": "Semana",
+    "month": "Mes"
   },
   "pdf": {
     "title": "Exportar PDF",

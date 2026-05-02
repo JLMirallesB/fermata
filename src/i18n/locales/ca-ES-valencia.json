@@ -11,7 +11,9 @@
     "themeLight": "Clar",
     "themeDark": "Fosc",
     "themeSystem": "Sistema",
-    "language": "Idioma"
+    "language": "Idioma",
+    "hideEditor": "Amagar editor",
+    "showEditor": "Mostrar editor"
   },
   "tabs": {
     "calendar": "Calendari",
@@ -35,6 +37,14 @@
     "assignees": "Assignats",
     "assigneesHelp": "Separats per coma",
     "status": "Estat",
+    "checklist": "Checklist",
+    "notes": "Notes",
+    "notesHelp": "Una nota per línia",
+    "depends": "Depén de",
+    "dependsAdd": "Afegir dependència...",
+    "dependsNone": "No hi ha tasques amb ID definit",
+    "dependsConflict": "Conflicte: comença abans que acabe la dependència",
+    "dependedBy": "Requerida per",
     "save": "Guardar",
     "cancel": "Cancel·lar"
   },
@@ -54,7 +64,13 @@
     "noTasks": "No hi ha tasques"
   },
   "calendar": {
-    "today": "Hui"
+    "today": "Hui",
+    "hideWeekends": "Amagar caps de setmana",
+    "showWeekends": "Mostrar caps de setmana"
+  },
+  "agenda": {
+    "week": "Setmana",
+    "month": "Mes"
   },
   "pdf": {
     "title": "Exportar PDF",
