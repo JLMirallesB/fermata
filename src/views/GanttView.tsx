@@ -226,13 +226,24 @@ export function GanttView({ tasks, tagColors, onTaskClick }: GanttViewProps) {
       for (const dep of row.task.depends) {
         const source = byEventId.get(dep);
         if (!source) continue;
-        const sourceEndDay = daysBetween(minDate, source.task.end);
-        const targetStartDay = daysBetween(minDate, row.task.start);
-        const conflict = row.task.start < source.task.end;
+
+        const sourceStart = daysBetween(minDate, source.task.start);
+        const sourceEnd = daysBetween(minDate, source.task.end);
+        const targetStart = daysBetween(minDate, row.task.start);
+
+        const fromX = source.task.milestone
+          ? sourceStart * dayWidth
+          : sourceEnd * dayWidth;
+        const toX = row.task.milestone
+          ? targetStart * dayWidth
+          : targetStart * dayWidth;
+
+        const conflict = !source.task.milestone && !row.task.milestone && row.task.start < source.task.end;
+
         result.push({
-          fromX: sourceEndDay * dayWidth,
+          fromX,
           fromY: source.y + ROW_HEIGHT / 2,
-          toX: targetStartDay * dayWidth,
+          toX,
           toY: row.y + ROW_HEIGHT / 2,
           conflict,
         });

@@ -55,6 +55,17 @@ export function Layout() {
 
   const allSections = useMemo(() => collectUniqueSections(tasks), [tasks]);
 
+  const allTags = useMemo(() => {
+    const set = new Set<string>();
+    const statusTags = new Set(['todo', 'doing', 'done']);
+    for (const task of tasks) {
+      for (const tag of task.tags) {
+        if (!statusTags.has(tag.toLowerCase())) set.add(tag);
+      }
+    }
+    return [...set].sort();
+  }, [tasks]);
+
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
       if (hiddenAssignees.size > 0 && task.assignees.length > 0) {
@@ -119,17 +130,29 @@ export function Layout() {
 
   const handleCreateEvent = useCallback((insertAt: number) => {
     const today = formatDate(new Date());
-    const newEvent = `${today}: Nuevo evento\n`;
-    const newText = text.slice(0, insertAt) + newEvent + text.slice(insertAt);
+    const before = text.slice(0, insertAt);
+    const after = text.slice(insertAt);
+
+    const needsNewlineBefore = before.length > 0 && !before.endsWith('\n\n') && !before.endsWith('\n');
+    const prefixedBefore = needsNewlineBefore ? before + '\n' : before;
+
+    const eventLine = `${today}: ${t('modal.newEvent')}\n`;
+
+    const needsNewlineAfter = after.length > 0 && !after.startsWith('\n');
+    const suffixedAfter = needsNewlineAfter ? '\n' + after : after;
+
+    const newText = prefixedBefore + eventLine + suffixedAfter;
     setText(newText);
+
+    const eventStart = prefixedBefore.length;
     setTimeout(() => {
       const parsed = parseTasks(newText);
-      const created = parsed.tasks.find((t) =>
-        t.textRange.from >= insertAt && t.textRange.from < insertAt + newEvent.length
+      const created = parsed.tasks.find((task) =>
+        task.textRange.from >= eventStart && task.textRange.from < eventStart + eventLine.length
       );
       if (created) setEditingTaskId(created.id);
     }, 50);
-  }, [text, setText]);
+  }, [text, setText, t]);
 
   const handlePdfExport = useCallback(async (views: ViewTab[]) => {
     const container = viewContainerRef.current;
@@ -319,6 +342,9 @@ export function Layout() {
       <EditTaskModal
         task={editingTask}
         allTasks={tasks}
+        allTags={allTags}
+        allAssignees={allAssignees}
+        tagColors={tagColors}
         onSave={handleSaveTask}
         onClose={() => setEditingTaskId(null)}
         onToggleChecklist={handleToggleChecklist}

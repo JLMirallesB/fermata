@@ -175,6 +175,46 @@ describe('editTask', () => {
     expect(result).toContain('My task');
   });
 
+  it('preserves checklists, id, depends and comments when editing title', () => {
+    const doc = [
+      '2024-01-01 / 2024-01-10: Original task #fase1',
+      'id: task-a',
+      'depends: task-b',
+      'assignee: Ana',
+      '- [x] Step one',
+      '- [ ] Step two',
+      '// Important note',
+    ].join('\n');
+
+    const { tasks } = parseTasks(doc);
+    const result = editTask(doc, tasks[0], { title: 'Updated task' });
+
+    expect(result).toContain('Updated task');
+    expect(result).toContain('id: task-a');
+    expect(result).toContain('depends: task-b');
+    expect(result).toContain('assignee: Ana');
+    expect(result).toContain('- [x] Step one');
+    expect(result).toContain('- [ ] Step two');
+    expect(result).toContain('// Important note');
+  });
+
+  it('preserves checklists and comments when changing assignee', () => {
+    const doc = [
+      '2024-01-01 / 2024-01-10: My task',
+      'assignee: Alice',
+      '- [x] Done item',
+      '// A comment',
+    ].join('\n');
+
+    const { tasks } = parseTasks(doc);
+    const result = editTask(doc, tasks[0], { assignees: ['Bob'] });
+
+    expect(result).toContain('assignee: Bob');
+    expect(result).not.toContain('Alice');
+    expect(result).toContain('- [x] Done item');
+    expect(result).toContain('// A comment');
+  });
+
   it('preserves tag colors and other header content', () => {
     const doc = [
       '#important: red',

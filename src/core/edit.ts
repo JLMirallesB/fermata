@@ -83,8 +83,8 @@ function applyStatusToTags(tags: string[], status: 'todo' | 'doing' | 'done' | '
 /**
  * Surgically edit a task within a Markwhen document.
  *
- * Replaces ONLY the text range of the specified task, preserving
- * everything else in the document exactly as-is.
+ * Only modifies the first line and assignee properties,
+ * preserving checklists, comments, id, depends, and all other content.
  */
 export function editTask(
   document: string,
@@ -92,30 +92,43 @@ export function editTask(
   changes: Partial<Pick<Task, 'title' | 'start' | 'end' | 'tags' | 'assignees' | 'status'>>,
 ): string {
   const { from, to } = task.textRange;
+  const taskText = document.slice(from, to);
+  const taskLines = taskText.split('\n');
 
-  // Resolve final values by merging changes with current task data
   const title = changes.title ?? task.title;
   const start = changes.start ?? task.start;
   const end = changes.end ?? task.end;
   let tags = changes.tags ?? [...task.tags];
   const assignees = changes.assignees ?? [...task.assignees];
 
-  // If status changed, update tags accordingly
   if (changes.status !== undefined) {
     tags = applyStatusToTags(tags, changes.status);
   }
 
-  // Build new task text
-  const firstLine = buildFirstLine(start, end, title, tags);
-  const propLines = buildPropertiesLines(assignees);
+  // Replace only the first line
+  taskLines[0] = buildFirstLine(start, end, title, tags);
 
-  const lines = [firstLine, ...propLines];
-  const newText = lines.join('\n');
+  // Update assignee/assignees property lines
+  const assigneeIdx = taskLines.findIndex((l) => /^\s*assignees?:/.test(l));
+  const newAssigneeLines = buildPropertiesLines(assignees);
 
-  // Splice: replace only the task's range in the document
-  const before = document.slice(0, from);
-  const after = document.slice(to);
-  return before + newText + after;
+  if (assigneeIdx >= 0) {
+    if (newAssigneeLines.length > 0) {
+      taskLines[assigneeIdx] = newAssigneeLines[0];
+    } else {
+      taskLines.splice(assigneeIdx, 1);
+    }
+  } else if (newAssigneeLines.length > 0) {
+    // Insert after first line, before any checklist/comment
+    let insertAt = 1;
+    while (insertAt < taskLines.length && /^\s*[\w\-.]+:/.test(taskLines[insertAt])) {
+      insertAt++;
+    }
+    taskLines.splice(insertAt, 0, newAssigneeLines[0]);
+  }
+
+  const newText = taskLines.join('\n');
+  return document.slice(0, from) + newText + document.slice(to);
 }
 
 /**

@@ -3,10 +3,14 @@ import { useTranslation } from 'react-i18next';
 import type { Task, ChecklistItem } from '../core/model';
 import type { KanbanStatus } from '../core/status';
 import { formatDate } from '../core/edit';
+import { ChipInput } from './ChipInput';
 
 interface EditTaskModalProps {
   task: Task | null;
   allTasks: Task[];
+  allTags: string[];
+  allAssignees: string[];
+  tagColors: Record<string, string>;
   onSave: (task: Task, changes: Partial<Pick<Task, 'title' | 'start' | 'end' | 'tags' | 'assignees' | 'status'>>) => void;
   onClose: () => void;
   onToggleChecklist: (item: ChecklistItem) => void;
@@ -18,15 +22,15 @@ function dateToInputValue(d: Date): string {
   return formatDate(d);
 }
 
-export function EditTaskModal({ task, allTasks, onSave, onClose, onToggleChecklist, onSaveNotes, onSetDepends }: EditTaskModalProps) {
+export function EditTaskModal({ task, allTasks, allTags, allAssignees, tagColors, onSave, onClose, onToggleChecklist, onSaveNotes, onSetDepends }: EditTaskModalProps) {
   const { t } = useTranslation();
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   const [title, setTitle] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [tags, setTags] = useState('');
-  const [assignees, setAssignees] = useState('');
+  const [tagsList, setTagsList] = useState<string[]>([]);
+  const [assigneesList, setAssigneesList] = useState<string[]>([]);
   const [status, setStatus] = useState<KanbanStatus>('none');
   const [notesText, setNotesText] = useState('');
 
@@ -38,8 +42,8 @@ export function EditTaskModal({ task, allTasks, onSave, onClose, onToggleCheckli
       setStartDate(dateToInputValue(task.start));
       setEndDate(dateToInputValue(task.end));
       const statusTags = new Set(['todo', 'doing', 'done']);
-      setTags(task.tags.filter((tg) => !statusTags.has(tg.toLowerCase())).join(', '));
-      setAssignees(task.assignees.join(', '));
+      setTagsList(task.tags.filter((tg) => !statusTags.has(tg.toLowerCase())));
+      setAssigneesList([...task.assignees]);
       setStatus(task.status);
       setNotesText(task.notes.join('\n'));
       if (!dialogRef.current?.open) {
@@ -67,16 +71,14 @@ export function EditTaskModal({ task, allTasks, onSave, onClose, onToggleCheckli
     if (!task) return;
     const statusTags = new Set(['todo', 'doing', 'done']);
     const originalNonStatusTags = task.tags.filter((tg) => !statusTags.has(tg.toLowerCase()));
-    const newNonStatusTags = tags.split(',').map((s) => s.trim()).filter(Boolean);
-    const newAssignees = assignees.split(',').map((s) => s.trim()).filter(Boolean);
 
     const changes: Partial<Pick<Task, 'title' | 'start' | 'end' | 'tags' | 'assignees' | 'status'>> = {};
 
     if (title !== task.title) changes.title = title;
     if (startDate !== dateToInputValue(task.start)) changes.start = new Date(startDate + 'T00:00:00');
     if (endDate !== dateToInputValue(task.end)) changes.end = new Date(endDate + 'T00:00:00');
-    if (JSON.stringify(newNonStatusTags) !== JSON.stringify(originalNonStatusTags)) changes.tags = newNonStatusTags;
-    if (JSON.stringify(newAssignees) !== JSON.stringify(task.assignees)) changes.assignees = newAssignees;
+    if (JSON.stringify(tagsList) !== JSON.stringify(originalNonStatusTags)) changes.tags = tagsList;
+    if (JSON.stringify(assigneesList) !== JSON.stringify(task.assignees)) changes.assignees = assigneesList;
     if (status !== task.status) changes.status = status;
 
     onSave(task, changes);
@@ -121,11 +123,22 @@ export function EditTaskModal({ task, allTasks, onSave, onClose, onToggleCheckli
           </div>
           <div>
             <label className={labelClass}>{t('modal.tags')}</label>
-            <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} className={inputClass} placeholder={t('modal.tagsHelp')} />
+            <ChipInput
+              value={tagsList}
+              onChange={setTagsList}
+              suggestions={allTags}
+              placeholder={t('modal.tagsHelp')}
+              chipColor={(tag) => tagColors[tag]}
+            />
           </div>
           <div>
             <label className={labelClass}>{t('modal.assignees')}</label>
-            <input type="text" value={assignees} onChange={(e) => setAssignees(e.target.value)} className={inputClass} placeholder={t('modal.assigneesHelp')} />
+            <ChipInput
+              value={assigneesList}
+              onChange={setAssigneesList}
+              suggestions={allAssignees}
+              placeholder={t('modal.assigneesHelp')}
+            />
           </div>
           <div>
             <label className={labelClass}>{t('modal.status')}</label>

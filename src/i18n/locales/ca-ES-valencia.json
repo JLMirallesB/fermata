@@ -45,6 +45,7 @@
     "dependsNone": "No hi ha tasques amb ID definit",
     "dependsConflict": "Conflicte: comença abans que acabe la dependència",
     "dependedBy": "Requerida per",
+    "newEvent": "Nou event",
     "save": "Guardar",
     "cancel": "Cancel·lar"
   },
