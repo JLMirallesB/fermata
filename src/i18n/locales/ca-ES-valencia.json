@@ -5,7 +5,7 @@
   "toolbar": {
     "import": "Importar",
     "export": "Exportar",
-    "exportText": "Exportar text (.mw)",
+    "exportText": "Exportar text (.md)",
     "exportPdf": "Exportar PDF",
     "theme": "Tema",
     "themeLight": "Clar",
@@ -87,5 +87,11 @@
   },
   "import": {
     "dropOrClick": "Arrossega un fitxer .mw o .md, o fes clic per a importar"
+  },
+  "about": {
+    "description": "Visualització de projectes des de text Markwhen",
+    "createdBy": "Creada per",
+    "withHelp": "Amb l'ajuda de Claude",
+    "horchata": "Invita'm a una orxata"
   }
 }

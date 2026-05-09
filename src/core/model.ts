@@ -20,6 +20,7 @@ export interface Task {
   assignees: string[];
   milestone: boolean;
   color: string | null;
+  colors: string[];
   status: KanbanStatus;
   textRange: { from: number; to: number };
   checklist: ChecklistItem[];
@@ -135,7 +136,8 @@ function walkEvents(
     const event = node;
     const tags = event.tags;
     const assignees = extractAssignees(event.properties as Record<string, string>);
-    const firstTagColor = tags.length > 0 ? (tagColors[tags[0]] ?? null) : null;
+    const tagColorList = tags.map((tg) => tagColors[tg]).filter((c): c is string => !!c);
+    const firstTagColor = tagColorList.length > 0 ? tagColorList[0] : null;
 
     const props = event.properties as Record<string, string>;
     const dependsRaw = props['depends'] ?? '';
@@ -153,6 +155,7 @@ function walkEvents(
       assignees,
       milestone: isMilestone(event),
       color: firstTagColor,
+      colors: tagColorList,
       status: deriveStatus(tags),
       textRange: {
         from: event.textRanges.whole.from,

@@ -11,154 +11,273 @@ interface TimelineViewProps {
   onTaskClick: (task: Task) => void;
 }
 
-function monthKey(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+function daysBetween(a: Date, b: Date): number {
+  return Math.max(0, Math.ceil((b.getTime() - a.getTime()) / 86400000));
+}
+
+function dateKey(d: Date): string {
+  return formatDate(d);
+}
+
+function formatDayLabel(d: Date, locale: string): string {
+  return d.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' });
 }
 
 function formatMonthLabel(d: Date, locale: string): string {
   return d.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
 }
 
+type DayEntry = {
+  date: string;
+  label: string;
+  starts: Task[];
+  ends: Task[];
+  milestones: Task[];
+};
+
 export function TimelineView({ tasks, tagColors, onTaskClick }: TimelineViewProps) {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const locale = i18n.language === 'ca-ES-valencia' ? 'ca' : i18n.language;
 
-  const sorted = useMemo(
-    () => [...tasks].sort((a, b) => a.start.getTime() - b.start.getTime()),
-    [tasks],
-  );
+  const { days, monthBreaks } = useMemo(() => {
+    if (tasks.length === 0) return { days: [], monthBreaks: new Set<string>() };
 
-  const grouped = useMemo(() => {
-    const map = new Map<string, { label: string; tasks: Task[] }>();
-    for (const task of sorted) {
-      const key = monthKey(task.start);
-      if (!map.has(key)) {
-        map.set(key, { label: formatMonthLabel(task.start, locale), tasks: [] });
+    const dayMap = new Map<string, DayEntry>();
+
+    const ensureDay = (d: Date): DayEntry => {
+      const key = dateKey(d);
+      if (!dayMap.has(key)) {
+        dayMap.set(key, { date: key, label: formatDayLabel(d, locale), starts: [], ends: [], milestones: [] });
       }
-      map.get(key)!.tasks.push(task);
-    }
-    return [...map.values()];
-  }, [sorted, locale]);
+      return dayMap.get(key)!;
+    };
 
-  const todayKey = monthKey(new Date());
+    for (const task of tasks) {
+      if (task.milestone) {
+        ensureDay(task.start).milestones.push(task);
+      } else {
+        ensureDay(task.start).starts.push(task);
+        ensureDay(task.end).ends.push(task);
+      }
+    }
+
+    const sorted = [...dayMap.values()].sort((a, b) => a.date.localeCompare(b.date));
+    const filtered = sorted.filter((d) => d.starts.length > 0 || d.ends.length > 0 || d.milestones.length > 0);
+
+    const breaks = new Set<string>();
+    let lastMonth = '';
+    for (const day of filtered) {
+      const m = day.date.slice(0, 7);
+      if (m !== lastMonth) {
+        breaks.add(day.date);
+        lastMonth = m;
+      }
+    }
+
+    return { days: filtered, monthBreaks: breaks };
+  }, [tasks, locale]);
+
   const todayStr = formatDate(new Date());
 
   if (tasks.length === 0) {
     return (
       <div className="flex h-full items-center justify-center text-gray-400 dark:text-gray-500">
-        No tasks
+        {t('list.noTasks')}
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-auto px-4 py-8">
-      <div className="relative mx-auto max-w-3xl">
-        {/* Central line */}
-        <div className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 bg-gray-200 dark:bg-gray-700" />
-
-        {grouped.map((group) => {
-          const isCurrentMonth = monthKey(group.tasks[0].start) === todayKey;
+    <div className="h-full overflow-auto px-4 py-6">
+      <div className="mx-auto max-w-4xl">
+        {days.map((day) => {
+          const isToday = day.date === todayStr;
+          const showMonth = monthBreaks.has(day.date);
+          const d = new Date(day.date + 'T00:00:00');
+          const leftItems = [...day.milestones, ...day.starts];
+          const rightItems = day.ends;
           return (
-            <div key={group.label} className="mb-8">
-              {/* Month label */}
-              <div className="relative mb-6 flex justify-center">
-                <span className={`relative z-10 rounded-full px-4 py-1 text-sm font-semibold ${
-                  isCurrentMonth
-                    ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300'
-                    : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
-                }`}>
-                  {group.label}
-                </span>
-              </div>
+            <div key={day.date}>
+              {/* Month separator */}
+              {showMonth && (
+                <div className="mb-4 mt-2 flex justify-center">
+                  <span className="rounded-full bg-gray-100 px-4 py-1 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                    {formatMonthLabel(d, locale)}
+                  </span>
+                </div>
+              )}
 
-              {/* Tasks alternating left/right */}
-              {group.tasks.map((task, i) => {
-                const isLeft = i % 2 === 0;
-                const color = task.color ?? tagColors[task.tags[0]] ?? '#6366f1';
-                const isToday = formatDate(task.start) === todayStr;
-
-                return (
-                  <div
-                    key={task.id}
-                    className={`relative mb-4 flex items-start ${isLeft ? 'justify-start' : 'justify-end'}`}
-                  >
-                    {/* Dot on the center line */}
-                    <div
-                      className={`absolute left-1/2 top-4 z-10 h-3 w-3 -translate-x-1/2 rounded-full border-2 border-white dark:border-gray-900 ${
-                        isToday ? 'ring-2 ring-red-400' : ''
-                      }`}
-                      style={{ backgroundColor: color }}
+              {/* Day row */}
+              <div className="mb-3 flex items-stretch gap-0">
+                {/* Left column: starts + milestones */}
+                <div className="flex w-[calc(50%-40px)] flex-col gap-1.5 pr-2">
+                  {leftItems.map((task) => (
+                    <TimelineCard
+                      key={task.id}
+                      task={task}
+                      side="start"
+                      tagColors={tagColors}
+                      onTaskClick={onTaskClick}
                     />
+                  ))}
+                  {leftItems.length === 0 && rightItems.length > 0 && (
+                    <div className="min-h-[40px]" />
+                  )}
+                </div>
 
-                    {/* Card */}
-                    <TaskTooltip task={task}>
-                      <div
-                        onClick={() => onTaskClick(task)}
-                        className={`w-[calc(50%-24px)] cursor-pointer rounded-lg border bg-white p-3 shadow-sm transition-shadow hover:shadow-md dark:bg-gray-800 ${
-                          isLeft ? 'mr-auto text-right' : 'ml-auto text-left'
-                        }`}
-                        style={{ borderColor: color, borderLeftWidth: isLeft ? 1 : 3, borderRightWidth: isLeft ? 3 : 1 }}
-                      >
-                        <div className={`flex items-center gap-2 ${isLeft ? 'flex-row-reverse' : ''}`}>
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {task.milestone ? '◆ ' : ''}{task.title}
-                          </span>
-                          {task.notes.length > 0 && <span className="text-gray-400">💬</span>}
-                        </div>
-
-                        <div className={`mt-1 text-xs text-gray-500 dark:text-gray-400 ${isLeft ? 'text-right' : 'text-left'}`}>
-                          {formatDate(task.start)}
-                          {!task.milestone && ` — ${formatDate(task.end)}`}
-                        </div>
-
-                        {task.section && (
-                          <div className={`mt-1 text-xs text-gray-400 dark:text-gray-500 ${isLeft ? 'text-right' : 'text-left'}`}>
-                            {task.section}
-                          </div>
-                        )}
-
-                        {task.assignees.length > 0 && (
-                          <div className={`mt-1 text-xs text-gray-400 dark:text-gray-500 ${isLeft ? 'text-right' : 'text-left'}`}>
-                            {task.assignees.join(', ')}
-                          </div>
-                        )}
-
-                        {task.checklist.length > 0 && (
-                          <div className={`mt-1.5 ${isLeft ? 'flex justify-end' : ''}`}>
-                            <ProgressBar checklist={task.checklist} />
-                          </div>
-                        )}
-
-                        {task.tags.length > 0 && (
-                          <div className={`mt-2 flex flex-wrap gap-1 ${isLeft ? 'justify-end' : ''}`}>
-                            {task.tags.filter((tg) => !['todo', 'doing', 'done'].includes(tg.toLowerCase())).map((tag) => (
-                              <span
-                                key={tag}
-                                className="inline-block rounded-full px-2 py-0.5 text-[10px] font-medium text-white"
-                                style={{ backgroundColor: tagColors[tag] ?? '#6b7280' }}
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </TaskTooltip>
+                {/* Center axis */}
+                <div className="relative flex w-[80px] shrink-0 flex-col items-center">
+                  {/* Vertical line */}
+                  <div className="absolute top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-700" />
+                  {/* Date badge */}
+                  <div className={`relative z-10 mt-2 rounded-full px-2 py-0.5 text-center text-[10px] font-semibold leading-tight ${
+                    isToday
+                      ? 'bg-red-500 text-white'
+                      : 'bg-white text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-700'
+                  }`}>
+                    {day.label}
                   </div>
-                );
-              })}
+                </div>
+
+                {/* Right column: ends */}
+                <div className="flex w-[calc(50%-40px)] flex-col gap-1.5 pl-2">
+                  {rightItems.map((task) => (
+                    <TimelineCard
+                      key={`end-${task.id}`}
+                      task={task}
+                      side="end"
+                      tagColors={tagColors}
+                      onTaskClick={onTaskClick}
+                    />
+                  ))}
+                  {rightItems.length === 0 && leftItems.length > 0 && (
+                    <div className="min-h-[40px]" />
+                  )}
+                </div>
+              </div>
             </div>
           );
         })}
 
-        {/* Today marker */}
-        <div className="relative flex justify-center">
-          <span className="relative z-10 rounded-full bg-red-500 px-3 py-0.5 text-xs font-semibold text-white">
-            {todayStr}
-          </span>
-        </div>
+        {/* Today marker if not already a day */}
+        {!days.some((d) => d.date === todayStr) && (
+          <div className="mt-4 flex justify-center">
+            <span className="rounded-full bg-red-500 px-3 py-0.5 text-xs font-semibold text-white">
+              {todayStr}
+            </span>
+          </div>
+        )}
       </div>
     </div>
+  );
+}
+
+function TimelineCard({
+  task,
+  side,
+  tagColors,
+  onTaskClick,
+}: {
+  task: Task;
+  side: 'start' | 'end';
+  tagColors: Record<string, string>;
+  onTaskClick: (task: Task) => void;
+}) {
+  const { t } = useTranslation();
+  const color = task.color ?? tagColors[task.tags[0]] ?? '#6366f1';
+  const days = daysBetween(task.start, task.end);
+  const isRange = !task.milestone && days > 1;
+  const isStart = side === 'start';
+  const cardId = `tl-${task.id}-${side}`;
+  const pairedId = `tl-${task.id}-${isStart ? 'end' : 'start'}`;
+
+  const goToPaired = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const el = document.getElementById(pairedId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('ring-2', 'ring-indigo-400');
+      setTimeout(() => el.classList.remove('ring-2', 'ring-indigo-400'), 1500);
+    }
+  };
+
+  return (
+    <TaskTooltip task={task}>
+      <div
+        id={cardId}
+        onClick={() => onTaskClick(task)}
+        className={`cursor-pointer rounded-lg border bg-white p-2.5 shadow-sm transition-shadow hover:shadow-md dark:bg-gray-800 ${
+          isStart ? 'border-l-3 border-r-0' : 'border-r-3 border-l-0'
+        }`}
+        style={{
+          borderColor: `color-mix(in srgb, ${color} 30%, transparent)`,
+          [isStart ? 'borderLeftColor' : 'borderRightColor']: color,
+        }}
+      >
+        {/* Header */}
+        <div className={`flex items-center gap-1.5 ${isStart ? '' : 'flex-row-reverse'}`}>
+          {/* Start/end/milestone indicator */}
+          <span
+            className="shrink-0 rounded px-1 py-0.5 text-[9px] font-bold uppercase text-white"
+            style={{ backgroundColor: color }}
+          >
+            {task.milestone ? '◆' : isStart ? '▸' : '◂'}
+          </span>
+          <span className={`min-w-0 flex-1 text-sm font-medium text-gray-900 dark:text-gray-100 ${isStart ? '' : 'text-right'}`}>
+            {task.title}
+          </span>
+          {task.notes.length > 0 && <span className="shrink-0 text-[10px] text-gray-400">💬</span>}
+          {isRange && (
+            <button
+              onClick={goToPaired}
+              className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+              title={isStart ? formatDate(task.end) : formatDate(task.start)}
+            >
+              {isStart ? `⤓ ${t('list.end')}` : `⤒ ${t('list.start')}`}
+            </button>
+          )}
+        </div>
+
+        {/* Date info */}
+        {isRange && (
+          <div className={`mt-1 flex items-center gap-1.5 text-[10px] text-gray-500 dark:text-gray-400 ${isStart ? '' : 'justify-end'}`}>
+            <span>{formatDate(task.start)}</span>
+            <span className="text-gray-300 dark:text-gray-600">→</span>
+            <span>{formatDate(task.end)}</span>
+            <span className="rounded bg-gray-100 px-1 tabular-nums text-gray-400 dark:bg-gray-700 dark:text-gray-500">
+              {days}d
+            </span>
+          </div>
+        )}
+
+        {/* Bottom row */}
+        <div className={`mt-1 flex items-center gap-2 ${isStart ? '' : 'flex-row-reverse'}`}>
+          {/* Tags */}
+          {task.tags.length > 0 && (
+            <div className={`flex flex-wrap gap-0.5 ${isStart ? '' : 'justify-end'}`}>
+              {task.tags.filter((tg) => !['todo', 'doing', 'done'].includes(tg.toLowerCase())).map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-block rounded-full px-1.5 py-0.5 text-[9px] font-medium text-white"
+                  style={{ backgroundColor: tagColors[tag] ?? '#6b7280' }}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {task.assignees.length > 0 && (
+            <span className="text-[10px] text-gray-400 dark:text-gray-500">
+              {task.assignees.join(', ')}
+            </span>
+          )}
+
+          {task.checklist.length > 0 && (
+            <ProgressBar checklist={task.checklist} />
+          )}
+        </div>
+      </div>
+    </TaskTooltip>
   );
 }

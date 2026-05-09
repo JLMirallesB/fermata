@@ -1,8 +1,11 @@
 import FullCalendar from '@fullcalendar/react';
 import listPlugin from '@fullcalendar/list';
+import esLocale from '@fullcalendar/core/locales/es';
+import caLocale from '@fullcalendar/core/locales/ca';
 import { useTranslation } from 'react-i18next';
 import type { Task } from '../core/model';
 import { attachDomTooltip } from '../components/TaskTooltip';
+import { multiColorGradient } from '../core/colorUtils';
 
 interface AgendaViewProps {
   tasks: Task[];
@@ -11,7 +14,12 @@ interface AgendaViewProps {
   hideWeekends: boolean;
 }
 
-export function AgendaView({ tasks, tagColors, onTaskClick, hideWeekends }: AgendaViewProps) {
+const localeMap: Record<string, typeof esLocale> = {
+  es: esLocale,
+  'ca-ES-valencia': caLocale,
+};
+
+export function AgendaView({ tasks, tagColors: _tagColors, onTaskClick, hideWeekends }: AgendaViewProps) {
   const { i18n, t } = useTranslation();
 
   const events = tasks.map((task) => ({
@@ -20,12 +28,12 @@ export function AgendaView({ tasks, tagColors, onTaskClick, hideWeekends }: Agen
     start: task.start,
     end: task.milestone ? undefined : task.end,
     allDay: true,
-    backgroundColor: task.color ?? tagColors[task.tags[0]] ?? '#6366f1',
-    borderColor: task.color ?? tagColors[task.tags[0]] ?? '#6366f1',
+    backgroundColor: task.colors.length > 0 ? task.colors[0] : '#6366f1',
+    borderColor: task.colors.length > 0 ? task.colors[0] : '#6366f1',
     extendedProps: { task },
   }));
 
-  const locale = i18n.language === 'ca-ES-valencia' ? 'ca' : i18n.language;
+  const fcLocale = localeMap[i18n.language];
 
   return (
     <div className="h-full overflow-auto p-4">
@@ -33,7 +41,7 @@ export function AgendaView({ tasks, tagColors, onTaskClick, hideWeekends }: Agen
         plugins={[listPlugin]}
         initialView="listMonth"
         events={events}
-        locale={locale}
+        locale={fcLocale ?? undefined}
         headerToolbar={{
           left: 'prev,next today',
           center: 'title',
@@ -53,6 +61,13 @@ export function AgendaView({ tasks, tagColors, onTaskClick, hideWeekends }: Agen
         eventDidMount={(info) => {
           const task = info.event.extendedProps.task as Task;
           attachDomTooltip(info.el, task.notes);
+          if (task.colors.length > 1) {
+            const dot = info.el.querySelector('.fc-list-event-dot') as HTMLElement | null;
+            if (dot) {
+              dot.style.background = multiColorGradient(task.colors);
+              dot.style.borderColor = 'transparent';
+            }
+          }
         }}
       />
     </div>

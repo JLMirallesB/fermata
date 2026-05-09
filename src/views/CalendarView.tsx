@@ -1,8 +1,11 @@
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
+import esLocale from '@fullcalendar/core/locales/es';
+import caLocale from '@fullcalendar/core/locales/ca';
 import { useTranslation } from 'react-i18next';
 import type { Task } from '../core/model';
 import { attachDomTooltip } from '../components/TaskTooltip';
+import { multiColorGradient } from '../core/colorUtils';
 
 interface CalendarViewProps {
   tasks: Task[];
@@ -11,7 +14,12 @@ interface CalendarViewProps {
   hideWeekends: boolean;
 }
 
-export function CalendarView({ tasks, tagColors, onTaskClick, hideWeekends }: CalendarViewProps) {
+const localeMap: Record<string, typeof esLocale> = {
+  es: esLocale,
+  'ca-ES-valencia': caLocale,
+};
+
+export function CalendarView({ tasks, tagColors: _tagColors, onTaskClick, hideWeekends }: CalendarViewProps) {
   const { i18n } = useTranslation();
 
   const events = tasks.map((task) => ({
@@ -20,12 +28,12 @@ export function CalendarView({ tasks, tagColors, onTaskClick, hideWeekends }: Ca
     start: task.start,
     end: task.milestone ? undefined : task.end,
     allDay: true,
-    backgroundColor: task.color ?? tagColors[task.tags[0]] ?? '#6366f1',
-    borderColor: task.color ?? tagColors[task.tags[0]] ?? '#6366f1',
+    backgroundColor: task.colors.length > 0 ? task.colors[0] : '#6366f1',
+    borderColor: task.colors.length > 0 ? task.colors[0] : '#6366f1',
     extendedProps: { task },
   }));
 
-  const locale = i18n.language === 'ca-ES-valencia' ? 'ca' : i18n.language;
+  const fcLocale = localeMap[i18n.language];
 
   return (
     <div className="h-full overflow-auto p-4">
@@ -33,7 +41,7 @@ export function CalendarView({ tasks, tagColors, onTaskClick, hideWeekends }: Ca
         plugins={[dayGridPlugin]}
         initialView="dayGridMonth"
         events={events}
-        locale={locale}
+        locale={fcLocale ?? undefined}
         headerToolbar={{
           left: 'prev,next today',
           center: 'title',
@@ -50,6 +58,10 @@ export function CalendarView({ tasks, tagColors, onTaskClick, hideWeekends }: Ca
         eventDidMount={(info) => {
           const task = info.event.extendedProps.task as Task;
           attachDomTooltip(info.el, task.notes);
+          if (task.colors.length > 1) {
+            info.el.style.background = multiColorGradient(task.colors);
+            info.el.style.borderColor = task.colors[0];
+          }
         }}
       />
     </div>

@@ -27,7 +27,7 @@ export function ExportMenu({ text, onOpenPdfModal }: ExportMenuProps) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'document.mw';
+    a.download = 'document.md';
     a.click();
     URL.revokeObjectURL(url);
     setOpen(false);

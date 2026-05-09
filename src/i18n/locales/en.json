@@ -5,7 +5,7 @@
   "toolbar": {
     "import": "Import",
     "export": "Export",
-    "exportText": "Export text (.mw)",
+    "exportText": "Export text (.md)",
     "exportPdf": "Export PDF",
     "theme": "Theme",
     "themeLight": "Light",
@@ -87,5 +87,11 @@
   },
   "import": {
     "dropOrClick": "Drop a .mw or .md file, or click to import"
+  },
+  "about": {
+    "description": "Project visualization from Markwhen text",
+    "createdBy": "Created by",
+    "withHelp": "With the help of Claude",
+    "horchata": "Buy me a horchata"
   }
 }

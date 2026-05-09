@@ -1,0 +1,65 @@
+1. Confirmación de plaza y matrícula alumnado del centro
+
+2026-06-15 / 2026-06-26: Matrícula alumnado EE y EP con asignaturas aprobadas (conv. ordinaria)
+2026-07-03: Fecha límite matrícula alumnado EP - evaluación extraordinaria
+
+2. Publicación de oferta de vacantes
+
+2026-05-05: Previsión de oferta de vacantes por especialidad
+2026-06-30: Oferta actualizada de vacantes por especialidad
+2026-07-17: Oferta de vacantes no cubiertas en 1ª adjudicación
+2026-07-24: Oferta de vacantes no cubiertas en 2ª adjudicación
+2026-09-16: Oferta de vacantes no cubiertas en conv. extraordinaria
+
+3. Convocatoria ordinaria - Pruebas de acceso
+
+2026-05-05 / 2026-05-19: Inscripción pruebas de acceso EE y EP
+2026-05-19 / 2026-05-25: Revisión y validación de inscripciones por los centros
+2026-05-26: Publicación listas provisionales admitidos y excluidos
+2026-05-27 / 2026-05-29: Reclamación listas provisionales
+2026-05-27 / 2026-06-02: Resolución reclamaciones por los centros
+2026-05-26 / 2026-06-05: Pago de tasas
+2026-06-09: Publicación listas definitivas admitidos y excluidos
+2026-06-10: Publicación composición de los tribunales
+2026-06-15 / 2026-06-22: Realización pruebas de acceso EE y EP
+2026-06-25: Publicación resultados provisionales pruebas de acceso
+2026-06-26 / 2026-06-29: Reclamación resultados provisionales
+2026-06-30: Resolución de reclamaciones
+2026-07-01: Publicación resultados definitivos pruebas de acceso
+
+4. Readmisión y cambio de especialidad
+
+2026-06-01 / 2026-06-26: Solicitud readmisión y cambio de especialidad
+
+5. Matriculación - 1ª adjudicación
+
+2026-07-06 / 2026-07-10: Nivel 1 de prioridad
+2026-07-06 / 2026-07-10: Nivel 2 prioridad - tramo A (4º a 2º curso EE)
+2026-07-13 / 2026-07-15: Nivel 2 prioridad - tramo B (1er curso EE)
+2026-07-16 / 2026-07-17: Nivel 3 de prioridad
+2026-07-16 / 2026-07-17: Nivel 4 de prioridad
+
+6. Matriculación - 2ª adjudicación
+
+2026-07-01 / 2026-07-20: Solicitud participación en la 2ª adjudicación
+2026-07-21 / 2026-07-23: Adjudicación de vacantes y matrícula 2ª adjudicación
+
+7. Convocatoria extraordinaria
+
+2026-07-10: Solicitud autorización conv. extraordinaria
+2026-07-14: Resolución autorización conv. extraordinaria
+2026-07-13 / 2026-07-15: Configuración oferta educativa ITACA3-GAC
+2026-07-16 / 2026-07-20: Inscripción pruebas de acceso (extraordinaria)
+2026-07-20 / 2026-07-22: Revisión y validación inscripciones por los centros
+2026-07-23: Publicación listas provisionales admitidos y excluidos
+2026-07-24 / 2026-07-28: Reclamación listas provisionales
+2026-07-24 / 2026-07-29: Resolución reclamaciones por los centros
+2026-07-24 / 2026-07-30: Pago de tasas
+2026-07-31: Publicación listas definitivas admitidos y excluidos
+2026-09-01: Publicación composición de los tribunales
+2026-09-02 / 2026-09-04: Realización pruebas de acceso EE y EP (extraordinaria)
+2026-09-07: Publicación resultados provisionales pruebas de acceso
+2026-09-08 / 2026-09-10: Reclamación resultados provisionales
+2026-09-11: Resolución de reclamaciones
+2026-09-14: Publicación resultados definitivos pruebas de acceso
+2026-09-15 / 2026-09-16: Adjudicación de vacantes y matrícula (extraordinaria)

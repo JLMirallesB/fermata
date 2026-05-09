@@ -9,6 +9,7 @@ import { ImportButton } from './ImportButton';
 import { ExportMenu } from './ExportMenu';
 import { EditTaskModal } from './EditTaskModal';
 import { PdfExportModal } from './PdfExportModal';
+import { AboutModal } from './AboutModal';
 import { FilterDropdown } from './FilterDropdown';
 import { CalendarView } from '../views/CalendarView';
 import { GanttView } from '../views/GanttView';
@@ -19,8 +20,8 @@ import { AgendaView } from '../views/AgendaView';
 import { useDocument } from '../hooks/useDocument';
 import { useModel } from '../hooks/useModel';
 import { useTheme } from '../hooks/useTheme';
-import { editTask, toggleChecklistItem, editTaskNotes, editTaskDepends } from '../core/edit';
-import type { Task, ChecklistItem } from '../core/model';
+import { editTask, toggleChecklistItem, editTaskNotes, editTaskDepends, formatDate } from '../core/edit';
+import { parseTasks, type Task, type ChecklistItem } from '../core/model';
 import type { KanbanStatus } from '../core/status';
 import { collectUniqueSections } from '../core/sections';
 import html2canvas from 'html2canvas';
@@ -37,6 +38,7 @@ export function Layout() {
   const editingTask = editingTaskId ? tasks.find((t) => t.id === editingTaskId) ?? null : null;
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
   const [showEditor, setShowEditor] = useState(true);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [hiddenAssignees, setHiddenAssignees] = useState<Set<string>>(new Set());
   const [hiddenSections, setHiddenSections] = useState<Set<string>>(new Set());
   const [hideWeekends, setHideWeekends] = useState(false);
@@ -115,41 +117,77 @@ export function Layout() {
     setText(newText);
   }, [text, setText]);
 
+  const handleCreateEvent = useCallback((insertAt: number) => {
+    const today = formatDate(new Date());
+    const newEvent = `${today}: Nuevo evento\n`;
+    const newText = text.slice(0, insertAt) + newEvent + text.slice(insertAt);
+    setText(newText);
+    setTimeout(() => {
+      const parsed = parseTasks(newText);
+      const created = parsed.tasks.find((t) =>
+        t.textRange.from >= insertAt && t.textRange.from < insertAt + newEvent.length
+      );
+      if (created) setEditingTaskId(created.id);
+    }, 50);
+  }, [text, setText]);
+
   const handlePdfExport = useCallback(async (views: ViewTab[]) => {
     const container = viewContainerRef.current;
     if (!container) return;
 
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     const savedTab = activeTab;
+    const isDark = document.documentElement.classList.contains('dark');
 
-    for (let i = 0; i < views.length; i++) {
-      setActiveTab(views[i]);
-      await new Promise((r) => setTimeout(r, 500));
+    try {
+      for (let i = 0; i < views.length; i++) {
+        setActiveTab(views[i]);
+        await new Promise((r) => setTimeout(r, 800));
 
-      const canvas = await html2canvas(container, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : '#ffffff',
-      });
+        const scrollEl = container.querySelector('[class*="overflow"]') as HTMLElement | null;
+        const origOverflow = scrollEl?.style.overflow;
+        const origHeight = scrollEl?.style.height;
+        const origMaxHeight = scrollEl?.style.maxHeight;
+        if (scrollEl) {
+          scrollEl.style.overflow = 'visible';
+          scrollEl.style.height = 'auto';
+          scrollEl.style.maxHeight = 'none';
+        }
 
-      const imgData = canvas.toDataURL('image/png');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgRatio = canvas.width / canvas.height;
+        const canvas = await html2canvas(container, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: isDark ? '#111827' : '#ffffff',
+          scrollY: 0,
+          scrollX: 0,
+        });
 
-      let drawWidth = pdfWidth - 20;
-      let drawHeight = drawWidth / imgRatio;
-      if (drawHeight > pdfHeight - 20) {
-        drawHeight = pdfHeight - 20;
-        drawWidth = drawHeight * imgRatio;
+        if (scrollEl) {
+          scrollEl.style.overflow = origOverflow ?? '';
+          scrollEl.style.height = origHeight ?? '';
+          scrollEl.style.maxHeight = origMaxHeight ?? '';
+        }
+
+        const imgData = canvas.toDataURL('image/png');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const imgRatio = canvas.width / canvas.height;
+
+        let drawWidth = pdfWidth - 20;
+        let drawHeight = drawWidth / imgRatio;
+        if (drawHeight > pdfHeight - 20) {
+          drawHeight = pdfHeight - 20;
+          drawWidth = drawHeight * imgRatio;
+        }
+
+        if (i > 0) pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 10, 10, drawWidth, drawHeight);
       }
 
-      if (i > 0) pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 10, 10, drawWidth, drawHeight);
+      pdf.save('fermata-export.pdf');
+    } finally {
+      setActiveTab(savedTab);
     }
-
-    pdf.save('fermata-export.pdf');
-    setActiveTab(savedTab);
   }, [activeTab]);
 
   const renderView = () => {
@@ -216,9 +254,25 @@ export function Layout() {
     <div className="flex h-screen flex-col bg-white dark:bg-gray-900">
       {/* Top bar */}
       <header className="flex items-center justify-between border-b border-gray-200 px-4 py-2 dark:border-gray-700">
-        <h1 className="text-lg font-bold text-indigo-600 dark:text-indigo-400">
-          {t('app.name')}
-        </h1>
+        <div className="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" className="h-6 w-6">
+            <circle cx="16" cy="18" r="3" fill="#6366f1" />
+            <path d="M6 22 C6 10, 16 2, 26 22" stroke="#6366f1" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+          </svg>
+          <h1 className="text-lg font-bold text-indigo-600 dark:text-indigo-400">
+            {t('app.name')}
+          </h1>
+          <button
+            onClick={() => setAboutOpen(true)}
+            className="rounded-full p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+            aria-label="About"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 16v-4M12 8h.01" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowEditor(!showEditor)}
@@ -240,7 +294,7 @@ export function Layout() {
       <div className="flex-1 overflow-hidden">
         {showEditor ? (
           <Splitter
-            left={<Editor value={text} onChange={setText} dark={resolved === 'dark'} />}
+            left={<Editor value={text} onChange={setText} dark={resolved === 'dark'} onCreateEvent={handleCreateEvent} />}
             right={
               <div className="flex h-full flex-col">
                 <TabBar active={activeTab} onChange={setActiveTab} />
@@ -275,6 +329,10 @@ export function Layout() {
         open={pdfModalOpen}
         onClose={() => setPdfModalOpen(false)}
         onExport={handlePdfExport}
+      />
+      <AboutModal
+        open={aboutOpen}
+        onClose={() => setAboutOpen(false)}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import type { Task } from '../core/model';
 import type { KanbanStatus } from '../core/status';
 import { ProgressBar } from '../components/ProgressBar';
 import { TaskTooltip } from '../components/TaskTooltip';
+import { ColorDots } from '../components/ColorDots';
 
 interface KanbanViewProps {
   tasks: Task[];
@@ -12,7 +13,7 @@ interface KanbanViewProps {
   onStatusChange?: (task: Task, newStatus: KanbanStatus) => void;
 }
 
-const COLUMNS: KanbanStatus[] = ['todo', 'doing', 'done', 'none'];
+const COLUMNS: KanbanStatus[] = ['none', 'todo', 'doing', 'done'];
 
 export function KanbanView({ tasks, tagColors, onTaskClick, onStatusChange }: KanbanViewProps) {
   const { t } = useTranslation();
@@ -85,11 +86,10 @@ export function KanbanView({ tasks, tagColors, onTaskClick, onStatusChange }: Ka
                 className="cursor-grab rounded-lg border border-gray-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md active:cursor-grabbing dark:border-gray-700 dark:bg-gray-800"
               >
                 <div className="flex items-start gap-2">
-                  {task.color && (
-                    <span
-                      className="mt-1 inline-block h-2.5 w-2.5 shrink-0 rounded-full"
-                      style={{ backgroundColor: task.color }}
-                    />
+                  {task.colors.length > 0 && (
+                    <div className="mt-1">
+                      <ColorDots colors={task.colors} />
+                    </div>
                   )}
                   <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                     {task.milestone ? '◆ ' : ''}{task.title}

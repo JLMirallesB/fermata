@@ -15,6 +15,7 @@ import {
   syntaxHighlighting,
   HighlightStyle,
   bracketMatching,
+  foldGutter,
 } from '@codemirror/language';
 import { tags } from '@lezer/highlight';
 import { autocompletion } from '@codemirror/autocomplete';
@@ -22,6 +23,8 @@ import { markwhenLanguage } from './markwhenLang';
 import { colorSwatchPlugin } from './colorWidgets';
 import { tagDotsPlugin } from './tagDots';
 import { tagCompletionSource } from './tagAutocomplete';
+import { foldHeadingsService } from './foldHeadings';
+import { addEventGutter, setAddEventCallback } from './addEventGutter';
 
 const lightTheme = EditorView.theme({
   '&': { height: '100%', fontSize: '14px' },
@@ -75,9 +78,12 @@ interface EditorProps {
   value: string;
   onChange: (value: string) => void;
   dark?: boolean;
+  onCreateEvent?: (insertAt: number) => void;
 }
 
-export function Editor({ value, onChange, dark = false }: EditorProps) {
+export function Editor({ value, onChange, dark = false, onCreateEvent }: EditorProps) {
+  const onCreateEventRef = useRef(onCreateEvent);
+  onCreateEventRef.current = onCreateEvent;
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const onChangeRef = useRef(onChange);
@@ -87,6 +93,13 @@ export function Editor({ value, onChange, dark = false }: EditorProps) {
     if (!containerRef.current) return;
 
     const isDark = dark;
+
+    setAddEventCallback((lineNo, view) => {
+      const line = view.state.doc.line(lineNo);
+      if (onCreateEventRef.current) {
+        onCreateEventRef.current(line.from);
+      }
+    });
 
     const updateListener = EditorView.updateListener.of((update) => {
       if (update.docChanged) {
@@ -98,6 +111,9 @@ export function Editor({ value, onChange, dark = false }: EditorProps) {
       doc: value,
       extensions: [
         lineNumbers(),
+        foldGutter(),
+        addEventGutter,
+        foldHeadingsService,
         highlightActiveLine(),
         highlightSpecialChars(),
         drawSelection(),

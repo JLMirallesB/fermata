@@ -5,7 +5,7 @@ import type { ViewTab } from './TabBar';
 interface PdfExportModalProps {
   open: boolean;
   onClose: () => void;
-  onExport: (views: ViewTab[]) => void;
+  onExport: (views: ViewTab[]) => Promise<void>;
 }
 
 const ALL_VIEWS: ViewTab[] = ['calendar', 'gantt', 'timeline', 'list', 'kanban', 'agenda'];
@@ -47,9 +47,12 @@ export function PdfExportModal({ open, onClose, onExport }: PdfExportModalProps)
   const handleExport = async () => {
     setGenerating(true);
     const views = ALL_VIEWS.filter((v) => selected.has(v));
-    onExport(views);
-    setGenerating(false);
-    onClose();
+    try {
+      await onExport(views);
+    } finally {
+      setGenerating(false);
+      onClose();
+    }
   };
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
