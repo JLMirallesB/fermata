@@ -45,6 +45,7 @@
     "dependsNone": "No tasks with a defined ID",
     "dependsConflict": "Conflict: starts before dependency ends",
     "dependedBy": "Required by",
+    "idHelp": "for dependencies",
     "newEvent": "New event",
     "save": "Save",
     "cancel": "Cancel"

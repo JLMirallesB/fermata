@@ -16,19 +16,21 @@ interface EditTaskModalProps {
   onToggleChecklist: (item: ChecklistItem) => void;
   onSaveNotes: (task: Task, notes: string[]) => void;
   onSetDepends: (task: Task, depends: string[]) => void;
+  onSaveId: (task: Task, id: string) => void;
 }
 
 function dateToInputValue(d: Date): string {
   return formatDate(d);
 }
 
-export function EditTaskModal({ task, allTasks, allTags, allAssignees, tagColors, onSave, onClose, onToggleChecklist, onSaveNotes, onSetDepends }: EditTaskModalProps) {
+export function EditTaskModal({ task, allTasks, allTags, allAssignees, tagColors, onSave, onClose, onToggleChecklist, onSaveNotes, onSetDepends, onSaveId }: EditTaskModalProps) {
   const { t } = useTranslation();
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   const [title, setTitle] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [eventId, setEventId] = useState('');
   const [tagsList, setTagsList] = useState<string[]>([]);
   const [assigneesList, setAssigneesList] = useState<string[]>([]);
   const [status, setStatus] = useState<KanbanStatus>('none');
@@ -39,6 +41,7 @@ export function EditTaskModal({ task, allTasks, allTags, allAssignees, tagColors
   useEffect(() => {
     if (task && taskId) {
       setTitle(task.title);
+      setEventId(task.eventId ?? '');
       setStartDate(dateToInputValue(task.start));
       setEndDate(dateToInputValue(task.end));
       const statusTags = new Set(['todo', 'doing', 'done']);
@@ -110,6 +113,27 @@ export function EditTaskModal({ task, allTasks, allTags, allAssignees, tagColors
           <div>
             <label className={labelClass}>{t('modal.title')}</label>
             <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className={inputClass} autoFocus />
+          </div>
+          <div>
+            <label className={labelClass}>
+              ID
+              <span className="ml-1 text-xs font-normal text-gray-400 dark:text-gray-500">{t('modal.idHelp')}</span>
+            </label>
+            <input
+              type="text"
+              value={eventId}
+              onChange={(e) => setEventId(e.target.value.replace(/\s+/g, '-').toLowerCase())}
+              onBlur={() => {
+                if (!task) return;
+                const newId = eventId.trim();
+                const oldId = task.eventId ?? '';
+                if (newId !== oldId) {
+                  onSaveId(task, newId);
+                }
+              }}
+              className={inputClass}
+              placeholder="mi-evento"
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>

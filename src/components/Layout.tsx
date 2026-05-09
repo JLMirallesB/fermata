@@ -20,7 +20,7 @@ import { AgendaView } from '../views/AgendaView';
 import { useDocument } from '../hooks/useDocument';
 import { useModel } from '../hooks/useModel';
 import { useTheme } from '../hooks/useTheme';
-import { editTask, toggleChecklistItem, editTaskNotes, editTaskDepends, formatDate } from '../core/edit';
+import { editTask, toggleChecklistItem, editTaskNotes, editTaskDepends, editTaskId, formatDate } from '../core/edit';
 import { parseTasks, type Task, type ChecklistItem } from '../core/model';
 import type { KanbanStatus } from '../core/status';
 import { collectUniqueSections } from '../core/sections';
@@ -125,6 +125,11 @@ export function Layout() {
 
   const handleSetDepends = useCallback((task: Task, depends: string[]) => {
     const newText = editTaskDepends(text, task, depends);
+    setText(newText);
+  }, [text, setText]);
+
+  const handleSaveId = useCallback((task: Task, id: string) => {
+    const newText = editTaskId(text, task, id);
     setText(newText);
   }, [text, setText]);
 
@@ -350,6 +355,7 @@ export function Layout() {
         onToggleChecklist={handleToggleChecklist}
         onSaveNotes={handleSaveNotes}
         onSetDepends={handleSetDepends}
+        onSaveId={handleSaveId}
       />
       <PdfExportModal
         open={pdfModalOpen}

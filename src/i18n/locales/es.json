@@ -45,6 +45,7 @@
     "dependsNone": "No hay tareas con ID definido",
     "dependsConflict": "Conflicto: empieza antes de que termine la dependencia",
     "dependedBy": "Requerida por",
+    "idHelp": "para dependencias",
     "newEvent": "Nuevo evento",
     "save": "Guardar",
     "cancel": "Cancelar"

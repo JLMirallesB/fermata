@@ -213,3 +213,28 @@ export function editTaskDepends(
   const newText = lines.join('\n');
   return document.slice(0, task.textRange.from) + newText + document.slice(task.textRange.to);
 }
+
+export function editTaskId(
+  document: string,
+  task: Task,
+  newId: string,
+): string {
+  const taskText = document.slice(task.textRange.from, task.textRange.to);
+  const lines = taskText.split('\n');
+
+  const idIdx = lines.findIndex((l) => /^\s*id:/.test(l));
+
+  if (newId === '') {
+    if (idIdx >= 0) lines.splice(idIdx, 1);
+  } else {
+    const newLine = `id: ${newId}`;
+    if (idIdx >= 0) {
+      lines[idIdx] = newLine;
+    } else {
+      lines.splice(1, 0, newLine);
+    }
+  }
+
+  const newText = lines.join('\n');
+  return document.slice(0, task.textRange.from) + newText + document.slice(task.textRange.to);
+}
