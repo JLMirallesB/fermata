@@ -8,7 +8,7 @@ interface PdfExportModalProps {
   onExport: (views: ViewTab[]) => Promise<void>;
 }
 
-const ALL_VIEWS: ViewTab[] = ['calendar', 'gantt', 'timeline', 'list', 'kanban', 'agenda'];
+const ALL_VIEWS: ViewTab[] = ['list', 'agenda'];
 
 export function PdfExportModal({ open, onClose, onExport }: PdfExportModalProps) {
   const { t } = useTranslation();

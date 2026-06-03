@@ -21,10 +21,10 @@ import { useDocument } from '../hooks/useDocument';
 import { useModel } from '../hooks/useModel';
 import { useTheme } from '../hooks/useTheme';
 import { editTask, toggleChecklistItem, editTaskNotes, editTaskDepends, editTaskId, formatDate } from '../core/edit';
+import { exportListPdf, exportAgendaPdf } from '../core/pdfExport';
 import { parseTasks, type Task, type ChecklistItem } from '../core/model';
 import type { KanbanStatus } from '../core/status';
 import { collectUniqueSections } from '../core/sections';
-import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
 export function Layout() {
@@ -160,63 +160,37 @@ export function Layout() {
   }, [text, setText, t]);
 
   const handlePdfExport = useCallback(async (views: ViewTab[]) => {
-    const container = viewContainerRef.current;
-    if (!container) return;
-
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-    const savedTab = activeTab;
-    const isDark = document.documentElement.classList.contains('dark');
+    let pageAdded = false;
 
-    try {
-      for (let i = 0; i < views.length; i++) {
-        setActiveTab(views[i]);
-        await new Promise((r) => setTimeout(r, 800));
+    for (const view of views) {
+      if (pageAdded) pdf.addPage();
 
-        const scrollEl = container.querySelector('[class*="overflow"]') as HTMLElement | null;
-        const origOverflow = scrollEl?.style.overflow;
-        const origHeight = scrollEl?.style.height;
-        const origMaxHeight = scrollEl?.style.maxHeight;
-        if (scrollEl) {
-          scrollEl.style.overflow = 'visible';
-          scrollEl.style.height = 'auto';
-          scrollEl.style.maxHeight = 'none';
-        }
-
-        const canvas = await html2canvas(container, {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: isDark ? '#111827' : '#ffffff',
-          scrollY: 0,
-          scrollX: 0,
+      if (view === 'list') {
+        exportListPdf(pdf, filteredTasks, {
+          title: `Fermata — ${t('tabs.list')}`,
+          header: t('list.title'),
+          start: t('list.start'),
+          end: t('list.end'),
+          section: t('list.section'),
+          assignees: t('list.assignees'),
+          tags: t('list.tags'),
         });
-
-        if (scrollEl) {
-          scrollEl.style.overflow = origOverflow ?? '';
-          scrollEl.style.height = origHeight ?? '';
-          scrollEl.style.maxHeight = origMaxHeight ?? '';
-        }
-
-        const imgData = canvas.toDataURL('image/png');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const imgRatio = canvas.width / canvas.height;
-
-        let drawWidth = pdfWidth - 20;
-        let drawHeight = drawWidth / imgRatio;
-        if (drawHeight > pdfHeight - 20) {
-          drawHeight = pdfHeight - 20;
-          drawWidth = drawHeight * imgRatio;
-        }
-
-        if (i > 0) pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 10, 10, drawWidth, drawHeight);
+        pageAdded = true;
+      } else if (view === 'agenda') {
+        exportAgendaPdf(pdf, filteredTasks, {
+          title: `Fermata — ${t('tabs.agenda')}`,
+          date: t('list.start'),
+          event: t('list.title'),
+        });
+        pageAdded = true;
       }
-
-      pdf.save('fermata-export.pdf');
-    } finally {
-      setActiveTab(savedTab);
     }
-  }, [activeTab]);
+
+    if (pageAdded) {
+      pdf.save('fermata-export.pdf');
+    }
+  }, [filteredTasks, t]);
 
   const renderView = () => {
     const viewProps = { tasks: filteredTasks, tagColors, onTaskClick: handleTaskClick };
