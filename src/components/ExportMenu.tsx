@@ -4,9 +4,10 @@ import { useTranslation } from 'react-i18next';
 interface ExportMenuProps {
   text: string;
   onOpenPdfModal: () => void;
+  onExportIcs: () => void;
 }
 
-export function ExportMenu({ text, onOpenPdfModal }: ExportMenuProps) {
+export function ExportMenu({ text, onOpenPdfModal, onExportIcs }: ExportMenuProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -54,6 +55,12 @@ export function ExportMenu({ text, onOpenPdfModal }: ExportMenuProps) {
             className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
           >
             {t('toolbar.exportPdf')}
+          </button>
+          <button
+            onClick={() => { onExportIcs(); setOpen(false); }}
+            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+          >
+            {t('toolbar.exportIcs')}
           </button>
         </div>
       )}

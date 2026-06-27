@@ -7,6 +7,7 @@
     "export": "Export",
     "exportText": "Export text (.md)",
     "exportPdf": "Export PDF",
+    "exportIcs": "Export calendar (.ics)",
     "theme": "Theme",
     "themeLight": "Light",
     "themeDark": "Dark",

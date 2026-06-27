@@ -22,6 +22,7 @@ import { useModel } from '../hooks/useModel';
 import { useTheme } from '../hooks/useTheme';
 import { editTask, toggleChecklistItem, editTaskNotes, editTaskDepends, editTaskId, formatDate } from '../core/edit';
 import { exportListPdf, exportAgendaPdf } from '../core/pdfExport';
+import { exportIcs } from '../core/icsExport';
 import { parseTasks, type Task, type ChecklistItem } from '../core/model';
 import type { KanbanStatus } from '../core/status';
 import { collectUniqueSections } from '../core/sections';
@@ -159,6 +160,17 @@ export function Layout() {
     }, 50);
   }, [text, setText, t]);
 
+  const handleIcsExport = useCallback(() => {
+    const ics = exportIcs(filteredTasks);
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'fermata-export.ics';
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [filteredTasks]);
+
   const handlePdfExport = useCallback(async (views: ViewTab[]) => {
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     let pageAdded = false;
@@ -285,7 +297,7 @@ export function Layout() {
             {showEditor ? '⟨⟩' : '⟩⟨'}
           </button>
           <ImportButton onImport={importText} />
-          <ExportMenu text={text} onOpenPdfModal={() => setPdfModalOpen(true)} />
+          <ExportMenu text={text} onOpenPdfModal={() => setPdfModalOpen(true)} onExportIcs={handleIcsExport} />
           <div className="mx-1 h-5 w-px bg-gray-300 dark:bg-gray-600" />
           <ThemeToggle mode={mode} onChangeMode={setMode} />
           <LanguageToggle />
