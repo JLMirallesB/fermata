@@ -95,6 +95,9 @@
     "description": "Project visualization from Markwhen text",
     "createdBy": "Created by",
     "withHelp": "With the help of Claude",
-    "horchata": "Buy me a horchata"
+    "horchata": "Buy me a horchata",
+    "codeLicense": "Code licensed under",
+    "contentLicense": "content under",
+    "source": "source code"
   }
 }

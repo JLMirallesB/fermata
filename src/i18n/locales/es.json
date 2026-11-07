@@ -95,6 +95,9 @@
     "description": "Visualización de proyectos desde texto Markwhen",
     "createdBy": "Creada por",
     "withHelp": "Con la ayuda de Claude",
-    "horchata": "Invítame a una horchata"
+    "horchata": "Invítame a una horchata",
+    "codeLicense": "Código bajo licencia",
+    "contentLicense": "contenidos bajo",
+    "source": "código fuente"
   }
 }

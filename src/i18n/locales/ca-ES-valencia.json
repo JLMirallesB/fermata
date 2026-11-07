@@ -95,6 +95,9 @@
     "description": "Visualització de projectes des de text Markwhen",
     "createdBy": "Creada per",
     "withHelp": "Amb l'ajuda de Claude",
-    "horchata": "Invita'm a una orxata"
+    "horchata": "Invita'm a una orxata",
+    "codeLicense": "Codi amb llicència",
+    "contentLicense": "continguts amb llicència",
+    "source": "codi font"
   }
 }

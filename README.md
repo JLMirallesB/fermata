@@ -64,4 +64,11 @@ Key features supported:
 
 ## License
 
-[MIT](LICENSE)
+© 2026 José Luis Miralles Bono ([jlmirall.es](https://jlmirall.es)) · joseluismirallesbono@gmail.com
+
+- **Code:** [GNU AGPL v3](LICENSE). You may use, study, modify and redistribute it, also commercially, as long as
+  anything you derive from it is published under the same license with its source code available, including
+  when offered as a web service.
+- **Content** (texts, documentation, examples): [CC BY-SA 4.0](LICENSE-CONTENIDOS).
+
+Versions published before 7 November 2026 were released under the MIT license and keep it.

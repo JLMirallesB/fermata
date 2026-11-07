@@ -57,7 +57,7 @@ export function AboutModal({ open, onClose }: AboutModalProps) {
           <p>
             {t('about.createdBy')}{' '}
             <a
-              href="https://www.jlmirall.es"
+              href="https://jlmirall.es"
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium text-indigo-600 hover:underline dark:text-indigo-400"
@@ -67,6 +67,11 @@ export function AboutModal({ open, onClose }: AboutModalProps) {
           </p>
           <p className="text-xs text-gray-400 dark:text-gray-500">
             {t('about.withHelp')}
+          </p>
+          <p className="text-xs">
+            <a href="mailto:joseluismirallesbono@gmail.com" className="text-indigo-600 hover:underline dark:text-indigo-400">
+              joseluismirallesbono@gmail.com
+            </a>
           </p>
         </div>
 
@@ -92,6 +97,15 @@ export function AboutModal({ open, onClose }: AboutModalProps) {
             {t('about.horchata')}
           </a>
         </div>
+
+        <p className="mt-4 text-xs text-gray-400 dark:text-gray-500">
+          {t('about.codeLicense')}{' '}
+          <a href="https://www.gnu.org/licenses/agpl-3.0.html" rel="license noopener noreferrer" target="_blank" className="underline">AGPL v3</a>
+          {' · '}{t('about.contentLicense')}{' '}
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license noopener noreferrer" target="_blank" className="underline">CC BY-SA 4.0</a>
+          {' · '}
+          <a href="https://github.com/JLMirallesB/fermata" target="_blank" rel="noopener noreferrer" className="underline">{t('about.source')}</a>
+        </p>
 
         <button
           onClick={onClose}
